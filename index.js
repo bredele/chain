@@ -98,13 +98,11 @@ Chain.prototype.bucket = function(buffer) {
 /**
  * Lazy evaluation.
  *
- * @param {Function} fn optional callback function
- * @param {Object} optional callback scope
  * @return {Chain} Chain
  * @api public
  */
 
-Chain.prototype.done = function(callback, scope) {
+Chain.prototype.done = function() {
 
   if(this.iterate) {
     var that = this;
@@ -114,7 +112,6 @@ Chain.prototype.done = function(callback, scope) {
   } else {
     this.handle(this.data);
   }
-  if(is.type('function', callback)) callback.call(scope, this.result);
 };
 
 /**
