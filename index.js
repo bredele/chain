@@ -1,4 +1,5 @@
 var truthy = require('truthy');
+var each = require('each');
 
 /**
  * Expose 'Chain'
@@ -18,7 +19,7 @@ function Chain(data) {
   this.stack = [];
   //should work with somne kind of sequence
   this.from(data);
-  this.each = true;
+  this.iterate = true;
 }
 
 
@@ -31,8 +32,8 @@ function Chain(data) {
  * @api public
  */
 
-Chain.prototype.from = function(data, each) {
-  this.each = truthy(each) || this.each;
+Chain.prototype.from = function(data, bool) {
+  this.iterate = truthy(bool) || this.iterate;
   this.data = data || [];
   return this;
 };
@@ -110,12 +111,12 @@ Chain.prototype.bucket = function(buffer) {
 
 Chain.prototype.done = function(callback, scope) {
 
-  if(this.each) {
-    //may be define a sequence to be able to use on many objects
-    for(var i = 0, l = this.data.length; i < l; i++) {
-      console.log(i, this.data);
-      this.handle(this.data[i]);
-    }
+  if(this.iterate) {
+    //may be refactor each, don't like the that
+    var that = this;
+    each(this.data, function(item, i){
+      that.handle(item);
+    });
   } else {
     this.handle(this.data);
   }
