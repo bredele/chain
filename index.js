@@ -36,21 +36,9 @@ function Chain(data, bool) {
  */
 
 Chain.prototype.from = function(data, bool) {
-
   this.iterate = is.truthy(is.defined(bool) ? bool : this.iterate);
-
   this.data = data || [];
   return this;
-};
-
-
-Chain.prototype.before = function() {
-  //work on the data not the item
-};
-
-
-Chain.prototype.after = function() {
-  //work on the data not the item
 };
 
 
@@ -78,19 +66,32 @@ Chain.prototype.handle = function(item) {
   var index = 0,
       self = this;
 
-  var data = (function next(data, severity) {
+  var value = (function next(data, int) {
+    // var severity = is.type('number', int) || 0;
+
+    // if(data instanceof Error) {
+    //   if(severity > 0) {
+    //     //execute filter but do something
+    //   } else {
+    //     return data;
+    //   }
+    // }
+
     var handler = self.stack[index++];
     if(handler) {
       handler[0].call(handler[1], next, data);
     }
     return data;
+    
   })(item);
-  return data;
+
+  return value;
 };
 
 
 /**
- * Add chaining bucket
+ * Add chaining bucket.
+ * 
  * 
  * @return {Chain} Chain
  * @api public
@@ -125,7 +126,7 @@ Chain.prototype.done = function(callback, scope) {
   } else {
     data = this.handle(this.data);
   }
-
+  console.log('done data=', data);
   if(typeof callback === 'function') callback.call(scope, data);
 
 };
