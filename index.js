@@ -1,25 +1,28 @@
-var truthy = require('truthy');
+var is = require('is');
 var each = require('each');
 
 /**
  * Expose 'Chain'
  */
 
-module.exports = function(data){
+module.exports = function(data, bool){
   //it could be cool to mixin data and create a chain from this data
-  return new Chain(data);
+  return new Chain(data, bool);
 };
 
 
 /**
  * Initialize a new Chain
+ * @param {Object} data Object to filter
+ * @param {Boolean} each true, iterate through each attribute of the object
  */
 
-function Chain(data) {
+function Chain(data, bool) {
   this.stack = [];
-  //should work with somne kind of sequence
-  this.from(data);
   this.iterate = true;
+
+  this.from(data, is.defined(bool) ? bool : this.iterate);
+
 }
 
 
@@ -33,7 +36,9 @@ function Chain(data) {
  */
 
 Chain.prototype.from = function(data, bool) {
-  this.iterate = truthy(bool) || this.iterate;
+
+  this.iterate = is.truthy(is.defined(bool) ? bool : this.iterate);
+
   this.data = data || [];
   return this;
 };
@@ -73,14 +78,14 @@ Chain.prototype.handle = function(item) {
   var index = 0,
       self = this;
 
-  (function next(data, severity) {
+  var data = (function next(data, severity) {
     var handler = self.stack[index++];
     if(handler) {
       handler[0].call(handler[1], next, data);
     }
-
+    return data;
   })(item);
-  return this;
+  return data;
 };
 
 
@@ -110,18 +115,18 @@ Chain.prototype.bucket = function(buffer) {
  */
 
 Chain.prototype.done = function(callback, scope) {
-
+  var data = null;
   if(this.iterate) {
     //may be refactor each, don't like the that
     var that = this;
     each(this.data, function(item, i){
-      that.handle(item);
+      data = that.handle(item);
     });
   } else {
-    this.handle(this.data);
+    data = this.handle(this.data);
   }
 
-  if(typeof callback === 'function') callback.call(scope);
+  if(typeof callback === 'function') callback.call(scope, data);
 
 };
 
