@@ -105,19 +105,16 @@ Chain.prototype.bucket = function(buffer) {
  */
 
 Chain.prototype.done = function(callback, scope) {
-  this.use(function(next, data){
-    if(is.type('function', callback)) callback.call(scope, data);
-  });
 
   if(this.iterate) {
     var that = this;
-    each(this.data, function(item, i){
+    each(this.data, function(item){
       that.handle(item);
     });
   } else {
     this.handle(this.data);
   }
-
+  if(is.type('function', callback)) callback.call(scope, this.result);
 };
 
 /**
