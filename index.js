@@ -1,3 +1,4 @@
+var truthy = require('truthy');
 
 /**
  * Expose 'Chain'
@@ -17,20 +18,35 @@ function Chain(data) {
   this.stack = [];
   //should work with somne kind of sequence
   this.from(data);
+  this.each = true;
 }
 
 
 /**
  * Add chaining sequence
+ * @param {Object} data Object to filter
+ * @param {Boolean} each true, iterate through each attribute of the object
  * 
  * @return {Chain} Chain
  * @api public
  */
 
-Chain.prototype.from = function(data) {
+Chain.prototype.from = function(data, each) {
+  this.each = truthy(each) || this.each;
   this.data = data || [];
   return this;
 };
+
+
+Chain.prototype.before = function() {
+  //work on the data not the item
+};
+
+
+Chain.prototype.after = function() {
+  //work on the data not the item
+};
+
 
 /**
  * Add chaining filter
@@ -56,8 +72,7 @@ Chain.prototype.handle = function(item) {
   var index = 0,
       self = this;
 
-  (function next(data) {
-
+  (function next(data, severity) {
     var handler = self.stack[index++];
     if(handler) {
       handler[0].call(handler[1], next, data);
@@ -95,11 +110,27 @@ Chain.prototype.bucket = function(buffer) {
 
 Chain.prototype.done = function(callback, scope) {
 
-  //may be define a sequence to be able to use on many objects
-  for(var i = 0, l = this.data.length; i < l; i++) {
-    this.handle(this.data[i]);
+  if(this.each) {
+    //may be define a sequence to be able to use on many objects
+    for(var i = 0, l = this.data.length; i < l; i++) {
+      console.log(i, this.data);
+      this.handle(this.data[i]);
+    }
+  } else {
+    this.handle(this.data);
   }
 
   if(typeof callback === 'function') callback.call(scope);
+
+};
+
+/**
+ * Execute callback when error(s) occured
+ * 
+ * @return {Chain} Chain
+ * @api public
+ */
+
+Chain.prototype.error = function(fn, scope) {
 
 };
