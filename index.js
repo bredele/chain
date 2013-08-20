@@ -20,7 +20,7 @@ module.exports = function(data, bool){
 function Chain(data, bool) {
   this.stack = [];
   this.iterate = true;
-
+  this.result = null;
   this.from(data, is.defined(bool) ? bool : this.iterate);
 
 }
@@ -66,17 +66,7 @@ Chain.prototype.handle = function(item) {
   var index = 0,
       self = this;
 
-  var value = (function next(data, int) {
-    // var severity = is.type('number', int) || 0;
-
-    // if(data instanceof Error) {
-    //   if(severity > 0) {
-    //     //execute filter but do something
-    //   } else {
-    //     return data;
-    //   }
-    // }
-
+  this.result = (function next(data) {
     var handler = self.stack[index++];
     if(handler) {
       handler[0].call(handler[1], next, data);
@@ -85,7 +75,6 @@ Chain.prototype.handle = function(item) {
     
   })(item);
 
-  return value;
 };
 
 
@@ -116,18 +105,18 @@ Chain.prototype.bucket = function(buffer) {
  */
 
 Chain.prototype.done = function(callback, scope) {
-  var data = null;
+  this.use(function(next, data){
+    if(is.type('function', callback)) callback.call(scope, data);
+  });
+
   if(this.iterate) {
-    //may be refactor each, don't like the that
     var that = this;
     each(this.data, function(item, i){
-      data = that.handle(item);
+      that.handle(item);
     });
   } else {
-    data = this.handle(this.data);
+    this.handle(this.data);
   }
-  console.log('done data=', data);
-  if(typeof callback === 'function') callback.call(scope, data);
 
 };
 
