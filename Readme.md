@@ -1,4 +1,3 @@
-
 # Chain
 
 Simple lazy chaining API.
@@ -6,7 +5,7 @@ Simple lazy chaining API.
 
 ## Installation
 
-    $ component install bredele/chain
+    $ component install leafs/chain
 
 ## API
 
