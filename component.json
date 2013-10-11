@@ -1,11 +1,11 @@
 {
   "name": "chain",
-  "repo": "leafs/chain",
+  "repo": "bredele/chain",
   "description": "",
   "version": "0.0.1",
   "keywords": [],
   "dependencies": {
-    "leafs/is": "*",
+    "bredele/is": "*",
     "component/each": "*"
   },
   "development": {},
